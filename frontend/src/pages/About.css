@@ -1,0 +1,48 @@
+.about-container {
+  min-height: 100vh;
+  background: linear-gradient(to right, #081c2c, #0a1a2f);
+  color: white;
+  padding: 40px;
+}
+
+.about-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.about-header h1 {
+  font-size: 40px;
+  color: #3b82f6;
+}
+
+.about-header p {
+  color: #bbb;
+}
+
+.about-main {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.profile-card {
+  background: #111827;
+  padding: 25px;
+  border-radius: 12px;
+  width: 280px;
+  text-align: center;
+}
+
+.profile-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+}
+
+.card {
+  background: #111827;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}

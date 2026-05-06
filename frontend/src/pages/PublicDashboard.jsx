@@ -1,63 +1,101 @@
+import { useNavigate } from "react-router-dom";
+
 function PublicDashboard() {
+
+  const navigate = useNavigate();
+
   const token = localStorage.getItem("token");
 
+  // 🔒 Check Login
   if (!token) {
     window.location.href = "/public-login";
   }
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
+    <div
+      style={{
+        textAlign: "center",
+        marginTop: "50px",
+      }}
+    >
+
+      {/* TITLE */}
       <h1>Welcome Public User 🎉</h1>
 
-      {/* 🔘 Feature Buttons */}
+      {/* BUTTONS */}
       <div style={{ marginTop: "30px" }}>
-        
-        {/* 🛒 BUY */}
+
+        {/* BUY */}
         <button
-          style={{ margin: "10px", padding: "10px 20px" }}
-          onClick={() => (window.location.href = "/buy")}
+          style={{
+            margin: "10px",
+            padding: "15px 25px",
+            cursor: "pointer",
+          }}
+          onClick={() => navigate("/buy")}
         >
           🛒 Buy Animals
         </button>
 
-        {/* 💰 SELL */}
+        {/* SELL */}
         <button
-          style={{ margin: "10px", padding: "10px 20px" }}
-          onClick={() => (window.location.href = "/sell")}
+          style={{
+            margin: "10px",
+            padding: "15px 25px",
+            cursor: "pointer",
+          }}
+          onClick={() => navigate("/sell")}
         >
           💰 Sell Animals
         </button>
 
-        {/* 👨‍⚕️ DOCTOR */}
+        {/* DOCTOR BOOKING */}
         <button
-          style={{ margin: "10px", padding: "10px 20px" }}
-          onClick={() => (window.location.href = "/doctor-booking")}
+          style={{
+            margin: "10px",
+            padding: "15px 25px",
+            cursor: "pointer",
+          }}
+          onClick={() => navigate("/animal-doctor-booking")}
         >
           👨‍⚕️ Doctor Booking
         </button>
 
-        {/* 📍 TRACKING */}
+        {/* TRACKING */}
         <button
-          style={{ margin: "10px", padding: "10px 20px" }}
-          onClick={() => (window.location.href = "/tracking")}
+          style={{
+            margin: "10px",
+            padding: "15px 25px",
+            cursor: "pointer",
+          }}
+          onClick={() => navigate("/tracking")}
         >
           📍 Animal Tracking
         </button>
 
       </div>
 
-      {/* 🚪 Logout */}
+      {/* LOGOUT */}
       <div style={{ marginTop: "40px" }}>
+
         <button
-          style={{ padding: "10px 20px", background: "red", color: "white" }}
+          style={{
+            padding: "12px 25px",
+            background: "red",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+          }}
           onClick={() => {
             localStorage.removeItem("token");
-            window.location.href = "/public-login";
+            navigate("/public-login");
           }}
         >
           Logout
         </button>
+
       </div>
+
     </div>
   );
 }

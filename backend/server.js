@@ -1,8 +1,10 @@
 const express = require("express");
 const connectDB = require("./database/db");
+
 const publicRoutes = require("./routes/publicRoutes");
 const doctorRoutes = require("./routes/doctorRoutes");
 const userRoutes = require("./routes/userRoutes");
+const bookingRoutes = require("./routes/bookingRoutes");
 
 require("dotenv").config();
 
@@ -10,6 +12,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
 const app = express();
+
 const PORT = process.env.PORT || 8000;
 
 
@@ -18,41 +21,46 @@ const PORT = process.env.PORT || 8000;
 // ✅ CORS
 app.use(cors());
 
-// ✅ JSON PARSER (🔥 SABSE IMPORTANT - YAHI FIX HAI)
+// ✅ BODY PARSER
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ✅ COOKIE
 app.use(cookieParser());
 
-// ✅ STATIC (image access)
+// ✅ STATIC FOLDER
 app.use("/uploads", express.static("uploads"));
 
 
-// ================= ROUTES =================
-
-// 🔥 multer wala route PEHLE
-app.use("/api/public", publicRoutes);
-
-// baaki routes
-app.use("/api/doctor", doctorRoutes);
-app.use("/api", userRoutes);
-
-
-// ================= DB =================
+// ================= DATABASE =================
 
 connectDB();
 
 
-// ================= TEST =================
+// ================= ROUTES =================
+
+// ✅ PUBLIC ROUTES
+app.use("/api/public", publicRoutes);
+
+// ✅ DOCTOR ROUTES
+app.use("/api/doctor", doctorRoutes);
+
+// ✅ USER ROUTES
+app.use("/api", userRoutes);
+
+// ✅ ANIMAL BOOKING ROUTES
+app.use("/api/bookings", bookingRoutes);
+
+
+// ================= TEST ROUTE =================
 
 app.get("/", (req, res) => {
-  res.send("Server chal raha hai 🚀");
+  res.send("ASGS Server Running 🚀");
 });
 
 
 // ================= SERVER =================
 
 app.listen(PORT, () => {
-  console.log(`🌐.. Awdh Server running SIR on ${PORT}. 🚀`);
+  console.log(`🌐 ASGS Server running on PORT ${PORT} 🚀`);
 });

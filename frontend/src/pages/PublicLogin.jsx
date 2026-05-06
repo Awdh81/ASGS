@@ -392,7 +392,7 @@ const injectStyles = () => {
         background: rgba(255,255,255,0.1) !important;
       }
     `;
-    document.head.appendChild(style)
+    document.head.appendChild(style);
   }
 };
 

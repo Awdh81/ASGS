@@ -4,8 +4,6 @@ import axios from "axios";
 const DoctorDashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [confirmingId, setConfirmingId] = useState(null);
-  const [rejectingId, setRejectingId] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
   const [activeTab, setActiveTab] = useState("pending");
   const [showHeader, setShowHeader] = useState(false);
@@ -37,38 +35,6 @@ const DoctorDashboard = () => {
       console.log(error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // CONFIRM BOOKING
-  const confirmBooking = async (id) => {
-    setConfirmingId(id);
-    try {
-      const res = await axios.put(`http://localhost:8000/api/bookings/confirm/${id}`);
-      alert(res.data.message);
-      await getBookings();
-    } catch (error) {
-      console.log(error);
-      alert("Failed to confirm booking. Please try again.");
-    } finally {
-      setConfirmingId(null);
-    }
-  };
-
-  // REJECT BOOKING
-  const rejectBooking = async (id) => {
-    if (!window.confirm("Are you sure you want to reject this booking?")) return;
-    
-    setRejectingId(id);
-    try {
-      const res = await axios.put(`http://localhost:8000/api/bookings/reject/${id}`);
-      alert(res.data.message);
-      await getBookings();
-    } catch (error) {
-      console.log(error);
-      alert("Failed to reject booking. Please try again.");
-    } finally {
-      setRejectingId(null);
     }
   };
 
@@ -204,16 +170,6 @@ const DoctorDashboard = () => {
               transform: translateY(0);
             }
           }
-          @keyframes slideUp {
-            from {
-              opacity: 1;
-              transform: translateY(0);
-            }
-            to {
-              opacity: 0;
-              transform: translateY(-100%);
-            }
-          }
           .card-expand {
             animation: fadeIn 0.3s ease-out;
           }
@@ -225,6 +181,27 @@ const DoctorDashboard = () => {
           }
           button:active {
             transform: translateY(0);
+          }
+          
+          input, textarea, select {
+            font-size: 14px !important;
+            background-color: #ffffff !important;
+            color: #1a1a1a !important;
+            border: 2px solid #d1d5db !important;
+            border-radius: 10px !important;
+            padding: 12px !important;
+            transition: all 0.3s ease !important;
+          }
+          
+          input::placeholder, textarea::placeholder {
+            color: #9ca3af !important;
+            opacity: 1 !important;
+          }
+          
+          input:focus, textarea:focus, select:focus {
+            border-color: #667eea !important;
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
           }
         `}
       </style>
@@ -302,7 +279,8 @@ const DoctorDashboard = () => {
                   background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
-                  margin: 0
+                  margin: 0,
+                  color: "#667eea"
                 }}>
                   Veterinary Dashboard
                 </h1>
@@ -320,8 +298,8 @@ const DoctorDashboard = () => {
                 textAlign: "center",
                 color: "white"
               }}>
-                <div style={{ fontSize: "10px", opacity: 0.9 }}>📋 TOTAL</div>
-                <div style={{ fontSize: "22px", fontWeight: "bold" }}>{bookings.length}</div>
+                <div style={{ fontSize: "10px", opacity: 0.9, color: "white" }}>📋 TOTAL</div>
+                <div style={{ fontSize: "22px", fontWeight: "bold", color: "white" }}>{bookings.length}</div>
               </div>
               <div style={{
                 background: "linear-gradient(135deg, #10b981, #059669)",
@@ -330,8 +308,8 @@ const DoctorDashboard = () => {
                 textAlign: "center",
                 color: "white"
               }}>
-                <div style={{ fontSize: "10px", opacity: 0.9 }}>✅ CONFIRMED</div>
-                <div style={{ fontSize: "22px", fontWeight: "bold" }}>{confirmedBookings.length}</div>
+                <div style={{ fontSize: "10px", opacity: 0.9, color: "white" }}>✅ CONFIRMED</div>
+                <div style={{ fontSize: "22px", fontWeight: "bold", color: "white" }}>{confirmedBookings.length}</div>
               </div>
               <div style={{
                 background: "linear-gradient(135deg, #f59e0b, #d97706)",
@@ -340,8 +318,8 @@ const DoctorDashboard = () => {
                 textAlign: "center",
                 color: "white"
               }}>
-                <div style={{ fontSize: "10px", opacity: 0.9 }}>⏳ PENDING</div>
-                <div style={{ fontSize: "22px", fontWeight: "bold" }}>{pendingBookings.length}</div>
+                <div style={{ fontSize: "10px", opacity: 0.9, color: "white" }}>⏳ PENDING</div>
+                <div style={{ fontSize: "22px", fontWeight: "bold", color: "white" }}>{pendingBookings.length}</div>
               </div>
               <div style={{
                 background: "linear-gradient(135deg, #ef4444, #dc2626)",
@@ -350,8 +328,8 @@ const DoctorDashboard = () => {
                 textAlign: "center",
                 color: "white"
               }}>
-                <div style={{ fontSize: "10px", opacity: 0.9 }}>❌ REJECTED</div>
-                <div style={{ fontSize: "22px", fontWeight: "bold" }}>{rejectedBookings.length}</div>
+                <div style={{ fontSize: "10px", opacity: 0.9, color: "white" }}>❌ REJECTED</div>
+                <div style={{ fontSize: "22px", fontWeight: "bold", color: "white" }}>{rejectedBookings.length}</div>
               </div>
             </div>
           </div>
@@ -366,7 +344,7 @@ const DoctorDashboard = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          background: "rgba(0,0,0,0.7)",
+          background: "rgba(0,0,0,0.8)",
           zIndex: 2000,
           display: "flex",
           alignItems: "center",
@@ -394,7 +372,7 @@ const DoctorDashboard = () => {
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <span style={{ fontSize: "28px" }}>➕</span>
-                <h2 style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>Create New Appointment</h2>
+                <h2 style={{ fontSize: "24px", fontWeight: "bold", margin: 0, color: "#1a1a1a" }}>Create New Appointment</h2>
               </div>
               <button
                 onClick={() => setShowCreateForm(false)}
@@ -406,7 +384,8 @@ const DoctorDashboard = () => {
                   width: "35px",
                   height: "35px",
                   cursor: "pointer",
-                  fontSize: "20px"
+                  fontSize: "20px",
+                  transition: "transform 0.2s"
                 }}
               >
                 ✕
@@ -415,63 +394,246 @@ const DoctorDashboard = () => {
 
             <form onSubmit={createNewAppointment}>
               {/* Owner Details */}
-              <div style={{ marginBottom: "20px" }}>
-                <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "15px", color: "#667eea" }}>👤 Owner Details</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <input type="text" name="ownerName" placeholder="Owner Name" value={newAppointment.ownerName} onChange={(e) => setNewAppointment({...newAppointment, ownerName: e.target.value})} style={{ padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }} required />
-                  <input type="email" name="email" placeholder="Email" value={newAppointment.email} onChange={(e) => setNewAppointment({...newAppointment, email: e.target.value})} style={{ padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }} required />
-                  <input type="text" name="phone" placeholder="Phone" value={newAppointment.phone} onChange={(e) => setNewAppointment({...newAppointment, phone: e.target.value})} style={{ padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }} required />
-                  <input type="text" name="address" placeholder="Address" value={newAppointment.address} onChange={(e) => setNewAppointment({...newAppointment, address: e.target.value})} style={{ padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }} required />
+              <div style={{ marginBottom: "25px" }}>
+                <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "15px", color: "#4f46e5" }}>👤 Owner Details</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <input 
+                    type="text" 
+                    placeholder="Owner Name" 
+                    value={newAppointment.ownerName} 
+                    onChange={(e) => setNewAppointment({...newAppointment, ownerName: e.target.value})} 
+                    style={{ 
+                      padding: "12px", 
+                      border: "2px solid #d1d5db", 
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      backgroundColor: "#ffffff",
+                      color: "#1a1a1a"
+                    }} 
+                    required 
+                  />
+                  <input 
+                    type="email" 
+                    placeholder="Email Address" 
+                    value={newAppointment.email} 
+                    onChange={(e) => setNewAppointment({...newAppointment, email: e.target.value})} 
+                    style={{ 
+                      padding: "12px", 
+                      border: "2px solid #d1d5db", 
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      backgroundColor: "#ffffff",
+                      color: "#1a1a1a"
+                    }} 
+                    required 
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Phone Number" 
+                    value={newAppointment.phone} 
+                    onChange={(e) => setNewAppointment({...newAppointment, phone: e.target.value})} 
+                    style={{ 
+                      padding: "12px", 
+                      border: "2px solid #d1d5db", 
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      backgroundColor: "#ffffff",
+                      color: "#1a1a1a"
+                    }} 
+                    required 
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Full Address" 
+                    value={newAppointment.address} 
+                    onChange={(e) => setNewAppointment({...newAppointment, address: e.target.value})} 
+                    style={{ 
+                      padding: "12px", 
+                      border: "2px solid #d1d5db", 
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      backgroundColor: "#ffffff",
+                      color: "#1a1a1a"
+                    }} 
+                    required 
+                  />
                 </div>
               </div>
 
               {/* Animal Details */}
-              <div style={{ marginBottom: "20px" }}>
+              <div style={{ marginBottom: "25px" }}>
                 <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "15px", color: "#10b981" }}>🐕 Animal Details</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <input type="text" name="animalType" placeholder="Animal Type" value={newAppointment.animalType} onChange={(e) => setNewAppointment({...newAppointment, animalType: e.target.value})} style={{ padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }} required />
-                  <input type="text" name="animalBreed" placeholder="Breed" value={newAppointment.animalBreed} onChange={(e) => setNewAppointment({...newAppointment, animalBreed: e.target.value})} style={{ padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }} />
-                  <input type="number" name="animalAge" placeholder="Age" value={newAppointment.animalAge} onChange={(e) => setNewAppointment({...newAppointment, animalAge: e.target.value})} style={{ padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }} />
-                  <select name="animalGender" value={newAppointment.animalGender} onChange={(e) => setNewAppointment({...newAppointment, animalGender: e.target.value})} style={{ padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }}>
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <input 
+                    type="text" 
+                    placeholder="Animal Type (Dog, Cat, etc.)" 
+                    value={newAppointment.animalType} 
+                    onChange={(e) => setNewAppointment({...newAppointment, animalType: e.target.value})} 
+                    style={{ 
+                      padding: "12px", 
+                      border: "2px solid #d1d5db", 
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      backgroundColor: "#ffffff",
+                      color: "#1a1a1a"
+                    }} 
+                    required 
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Breed" 
+                    value={newAppointment.animalBreed} 
+                    onChange={(e) => setNewAppointment({...newAppointment, animalBreed: e.target.value})} 
+                    style={{ 
+                      padding: "12px", 
+                      border: "2px solid #d1d5db", 
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      backgroundColor: "#ffffff",
+                      color: "#1a1a1a"
+                    }} 
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="Age (in years)" 
+                    value={newAppointment.animalAge} 
+                    onChange={(e) => setNewAppointment({...newAppointment, animalAge: e.target.value})} 
+                    style={{ 
+                      padding: "12px", 
+                      border: "2px solid #d1d5db", 
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      backgroundColor: "#ffffff",
+                      color: "#1a1a1a"
+                    }} 
+                  />
+                  <select 
+                    value={newAppointment.animalGender} 
+                    onChange={(e) => setNewAppointment({...newAppointment, animalGender: e.target.value})} 
+                    style={{ 
+                      padding: "12px", 
+                      border: "2px solid #d1d5db", 
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      backgroundColor: "#ffffff",
+                      color: "#1a1a1a",
+                      cursor: "pointer"
+                    }}>
+                    <option value="" style={{ color: "#1a1a1a" }}>Select Gender</option>
+                    <option value="Male" style={{ color: "#1a1a1a" }}>Male</option>
+                    <option value="Female" style={{ color: "#1a1a1a" }}>Female</option>
                   </select>
                 </div>
               </div>
 
               {/* Health Details */}
-              <div style={{ marginBottom: "20px" }}>
+              <div style={{ marginBottom: "25px" }}>
                 <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "15px", color: "#ef4444" }}>🏥 Health Details</h3>
-                <textarea name="problem" placeholder="Describe the problem" value={newAppointment.problem} onChange={(e) => setNewAppointment({...newAppointment, problem: e.target.value})} rows="3" style={{ width: "100%", padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px", marginBottom: "10px" }} required></textarea>
-                <textarea name="symptoms" placeholder="Symptoms" value={newAppointment.symptoms} onChange={(e) => setNewAppointment({...newAppointment, symptoms: e.target.value})} rows="2" style={{ width: "100%", padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px", marginBottom: "10px" }}></textarea>
-                <select name="emergency" value={newAppointment.emergency} onChange={(e) => setNewAppointment({...newAppointment, emergency: e.target.value})} style={{ width: "100%", padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }}>
-                  <option value="No">No Emergency</option>
-                  <option value="Emergency">Emergency</option>
+                <textarea 
+                  placeholder="Describe the medical problem" 
+                  value={newAppointment.problem} 
+                  onChange={(e) => setNewAppointment({...newAppointment, problem: e.target.value})} 
+                  rows="3" 
+                  style={{ 
+                    width: "100%", 
+                    padding: "12px", 
+                    border: "2px solid #d1d5db", 
+                    borderRadius: "10px",
+                    fontSize: "14px",
+                    backgroundColor: "#ffffff",
+                    color: "#1a1a1a",
+                    marginBottom: "12px",
+                    resize: "vertical"
+                  }} 
+                  required 
+                />
+                <textarea 
+                  placeholder="List all symptoms" 
+                  value={newAppointment.symptoms} 
+                  onChange={(e) => setNewAppointment({...newAppointment, symptoms: e.target.value})} 
+                  rows="2" 
+                  style={{ 
+                    width: "100%", 
+                    padding: "12px", 
+                    border: "2px solid #d1d5db", 
+                    borderRadius: "10px",
+                    fontSize: "14px",
+                    backgroundColor: "#ffffff",
+                    color: "#1a1a1a",
+                    marginBottom: "12px",
+                    resize: "vertical"
+                  }} 
+                />
+                <select 
+                  value={newAppointment.emergency} 
+                  onChange={(e) => setNewAppointment({...newAppointment, emergency: e.target.value})} 
+                  style={{ 
+                    width: "100%", 
+                    padding: "12px", 
+                    border: "2px solid #d1d5db", 
+                    borderRadius: "10px",
+                    fontSize: "14px",
+                    backgroundColor: "#ffffff",
+                    color: "#1a1a1a",
+                    cursor: "pointer"
+                  }}>
+                  <option value="No" style={{ color: "#1a1a1a" }}>No Emergency</option>
+                  <option value="Emergency" style={{ color: "#1a1a1a" }}>🚨 Emergency</option>
                 </select>
               </div>
 
               {/* Appointment Time */}
-              <div style={{ marginBottom: "20px" }}>
+              <div style={{ marginBottom: "25px" }}>
                 <h3 style={{ fontSize: "18px", fontWeight: "bold", marginBottom: "15px", color: "#3b82f6" }}>📅 Appointment Time</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                  <input type="date" name="preferredDate" value={newAppointment.preferredDate} onChange={(e) => setNewAppointment({...newAppointment, preferredDate: e.target.value})} style={{ padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }} required />
-                  <input type="time" name="preferredTime" value={newAppointment.preferredTime} onChange={(e) => setNewAppointment({...newAppointment, preferredTime: e.target.value})} style={{ padding: "10px", border: "2px solid #e0e0e0", borderRadius: "10px" }} required />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <input 
+                    type="date" 
+                    value={newAppointment.preferredDate} 
+                    onChange={(e) => setNewAppointment({...newAppointment, preferredDate: e.target.value})} 
+                    style={{ 
+                      padding: "12px", 
+                      border: "2px solid #d1d5db", 
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      backgroundColor: "#ffffff",
+                      color: "#1a1a1a"
+                    }} 
+                    required 
+                  />
+                  <input 
+                    type="time" 
+                    value={newAppointment.preferredTime} 
+                    onChange={(e) => setNewAppointment({...newAppointment, preferredTime: e.target.value})} 
+                    style={{ 
+                      padding: "12px", 
+                      border: "2px solid #d1d5db", 
+                      borderRadius: "10px",
+                      fontSize: "14px",
+                      backgroundColor: "#ffffff",
+                      color: "#1a1a1a"
+                    }} 
+                    required 
+                  />
                 </div>
               </div>
 
-              <button type="submit" disabled={creatingAppointment} style={{
-                width: "100%",
-                background: "linear-gradient(135deg, #667eea, #764ba2)",
-                color: "white",
-                padding: "14px",
-                border: "none",
-                borderRadius: "12px",
-                fontSize: "16px",
-                fontWeight: "bold",
-                cursor: "pointer"
-              }}>
-                {creatingAppointment ? "Creating..." : "➕ Create Appointment"}
+              <button 
+                type="submit" 
+                disabled={creatingAppointment} 
+                style={{
+                  width: "100%",
+                  background: "linear-gradient(135deg, #667eea, #764ba2)",
+                  color: "white",
+                  padding: "14px",
+                  border: "none",
+                  borderRadius: "12px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  transition: "transform 0.2s"
+                }}
+              >
+                {creatingAppointment ? "⏳ Creating..." : "➕ Create Appointment"}
               </button>
             </form>
           </div>
@@ -484,7 +646,7 @@ const DoctorDashboard = () => {
         gap: "10px", 
         marginBottom: "20px", 
         flexWrap: "wrap",
-        marginTop: showHeader ? "0" : "60px"
+        marginTop: "60px"
       }}>
         <button
           onClick={() => setActiveTab("pending")}
@@ -495,8 +657,9 @@ const DoctorDashboard = () => {
             border: "none",
             cursor: "pointer",
             background: activeTab === "pending" ? "#f59e0b" : "white",
-            color: activeTab === "pending" ? "white" : "#666",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+            color: activeTab === "pending" ? "white" : "#4a4a4a",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            transition: "all 0.2s"
           }}
         >
           ⏳ Pending ({pendingBookings.length})
@@ -510,8 +673,9 @@ const DoctorDashboard = () => {
             border: "none",
             cursor: "pointer",
             background: activeTab === "confirmed" ? "#10b981" : "white",
-            color: activeTab === "confirmed" ? "white" : "#666",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+            color: activeTab === "confirmed" ? "white" : "#4a4a4a",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            transition: "all 0.2s"
           }}
         >
           ✅ Confirmed ({confirmedBookings.length})
@@ -525,15 +689,16 @@ const DoctorDashboard = () => {
             border: "none",
             cursor: "pointer",
             background: activeTab === "rejected" ? "#ef4444" : "white",
-            color: activeTab === "rejected" ? "white" : "#666",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
+            color: activeTab === "rejected" ? "white" : "#4a4a4a",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            transition: "all 0.2s"
           }}
         >
           ❌ Rejected ({rejectedBookings.length})
         </button>
       </div>
 
-      {/* Appointments List */}
+      {/* Appointments List - NO CONFIRM/REJECT BUTTONS */}
       {getCurrentBookings().length === 0 ? (
         <div style={{
           backgroundColor: "white",
@@ -547,11 +712,11 @@ const DoctorDashboard = () => {
             {activeTab === "confirmed" && "✅"}
             {activeTab === "rejected" && "❌"}
           </div>
-          <h3 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "10px", color: "#333" }}>
+          <h3 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "10px", color: "#1a1a1a" }}>
             No {activeTab} appointments
           </h3>
-          <p style={{ color: "#666" }}>
-            {activeTab === "pending" && "All caught up! No pending appointments."}
+          <p style={{ color: "#6b7280" }}>
+            {activeTab === "pending" && "No pending appointments available."}
             {activeTab === "confirmed" && "No confirmed appointments yet."}
             {activeTab === "rejected" && "No rejected appointments."}
           </p>
@@ -565,7 +730,8 @@ const DoctorDashboard = () => {
               border: "none",
               borderRadius: "12px",
               fontWeight: "bold",
-              cursor: "pointer"
+              cursor: "pointer",
+              transition: "transform 0.2s"
             }}
           >
             ➕ Create New Appointment
@@ -625,10 +791,10 @@ const DoctorDashboard = () => {
                         <span style={{ fontSize: "30px" }}>{getAnimalEmoji(item.animalType)}</span>
                       </div>
                       <div>
-                        <h3 style={{ color: "white", fontSize: "22px", fontWeight: "bold", margin: 0 }}>
+                        <h3 style={{ color: "white", fontSize: "20px", fontWeight: "bold", margin: 0 }}>
                           {item.ownerName}'s {item.animalType}
                         </h3>
-                        <div style={{ display: "flex", gap: "15px", marginTop: "8px", color: "rgba(255,255,255,0.95)", fontSize: "14px", flexWrap: "wrap" }}>
+                        <div style={{ display: "flex", gap: "15px", marginTop: "8px", color: "rgba(255,255,255,0.95)", fontSize: "13px", flexWrap: "wrap" }}>
                           <span>👤 {item.ownerName}</span>
                           <span>📅 {new Date(item.preferredDate).toLocaleDateString()}</span>
                           <span>⏰ {item.preferredTime}</span>
@@ -651,44 +817,23 @@ const DoctorDashboard = () => {
                 </div>
               </div>
 
-              {/* Expanded Content */}
+              {/* Expanded Content - NO BUTTONS */}
               {expandedId === item._id && (
                 <div style={{ padding: "25px", background: "#f8f9fa" }}>
                   
+                  {/* Status Message Only - No Buttons */}
                   {item.status === "Pending" && (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "15px", marginBottom: "25px" }}>
-                      <button
-                        onClick={() => confirmBooking(item._id)}
-                        disabled={confirmingId === item._id}
-                        style={{
-                          background: "linear-gradient(135deg, #10b981, #059669)",
-                          color: "white",
-                          padding: "14px",
-                          border: "none",
-                          borderRadius: "12px",
-                          fontWeight: "bold",
-                          fontSize: "16px",
-                          cursor: "pointer"
-                        }}
-                      >
-                        {confirmingId === item._id ? "⏳ Confirming..." : "✅ Confirm Booking"}
-                      </button>
-                      <button
-                        onClick={() => rejectBooking(item._id)}
-                        disabled={rejectingId === item._id}
-                        style={{
-                          background: "linear-gradient(135deg, #ef4444, #dc2626)",
-                          color: "white",
-                          padding: "14px",
-                          border: "none",
-                          borderRadius: "12px",
-                          fontWeight: "bold",
-                          fontSize: "16px",
-                          cursor: "pointer"
-                        }}
-                      >
-                        {rejectingId === item._id ? "⏳ Rejecting..." : "❌ Reject Booking"}
-                      </button>
+                    <div style={{
+                      background: "#fef3c7",
+                      padding: "12px",
+                      borderRadius: "10px",
+                      marginBottom: "20px",
+                      textAlign: "center",
+                      border: "2px solid #f59e0b"
+                    }}>
+                      <p style={{ color: "#92400e", fontSize: "14px", margin: 0, fontWeight: "bold" }}>
+                        ⏳ This appointment is currently <strong>PENDING</strong>
+                      </p>
                     </div>
                   )}
 
@@ -701,7 +846,7 @@ const DoctorDashboard = () => {
                       marginBottom: "25px",
                       border: "2px solid #10b981"
                     }}>
-                      <p style={{ fontWeight: "bold", color: "#065f46", fontSize: "18px", margin: 0 }}>
+                      <p style={{ fontWeight: "bold", color: "#065f46", fontSize: "16px", margin: 0 }}>
                         ✅ APPOINTMENT CONFIRMED! 🎉
                       </p>
                     </div>
@@ -716,7 +861,7 @@ const DoctorDashboard = () => {
                       marginBottom: "25px",
                       border: "2px solid #ef4444"
                     }}>
-                      <p style={{ fontWeight: "bold", color: "#991b1b", fontSize: "18px", margin: 0 }}>
+                      <p style={{ fontWeight: "bold", color: "#991b1b", fontSize: "16px", margin: 0 }}>
                         ❌ APPOINTMENT REJECTED 💔
                       </p>
                     </div>
@@ -724,29 +869,29 @@ const DoctorDashboard = () => {
 
                   {/* Details Sections */}
                   <div style={{ background: "white", padding: "18px", borderRadius: "12px", marginBottom: "15px" }}>
-                    <h4 style={{ fontWeight: "bold", marginBottom: "15px", color: "#333" }}>👤 Owner Details</h4>
+                    <h4 style={{ fontWeight: "bold", marginBottom: "15px", color: "#1a1a1a" }}>👤 Owner Details</h4>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px" }}>
-                      <div><strong>Name:</strong> {item.ownerName}</div>
-                      <div><strong>Email:</strong> {item.email}</div>
-                      <div><strong>Phone:</strong> {item.phone}</div>
-                      <div><strong>Address:</strong> {item.address}</div>
+                      <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Name:</strong> {item.ownerName}</div>
+                      <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Email:</strong> {item.email}</div>
+                      <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Phone:</strong> {item.phone}</div>
+                      <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Address:</strong> {item.address}</div>
                     </div>
                   </div>
 
                   <div style={{ background: "white", padding: "18px", borderRadius: "12px", marginBottom: "15px" }}>
-                    <h4 style={{ fontWeight: "bold", marginBottom: "15px", color: "#333" }}>🐕 Animal Details</h4>
+                    <h4 style={{ fontWeight: "bold", marginBottom: "15px", color: "#1a1a1a" }}>🐕 Animal Details</h4>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "10px" }}>
-                      <div><strong>Type:</strong> {item.animalType}</div>
-                      <div><strong>Breed:</strong> {item.animalBreed || "Not specified"}</div>
-                      <div><strong>Age:</strong> {item.animalAge} years</div>
-                      <div><strong>Gender:</strong> {item.animalGender}</div>
+                      <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Type:</strong> {item.animalType}</div>
+                      <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Breed:</strong> {item.animalBreed || "Not specified"}</div>
+                      <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Age:</strong> {item.animalAge} years</div>
+                      <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Gender:</strong> {item.animalGender}</div>
                     </div>
                   </div>
 
                   <div style={{ background: "white", padding: "18px", borderRadius: "12px", marginBottom: "15px" }}>
-                    <h4 style={{ fontWeight: "bold", marginBottom: "15px", color: "#333" }}>🏥 Health Details</h4>
-                    <div><strong>Problem:</strong> {item.problem}</div>
-                    <div style={{ marginTop: "10px" }}><strong>Symptoms:</strong> {item.symptoms}</div>
+                    <h4 style={{ fontWeight: "bold", marginBottom: "15px", color: "#1a1a1a" }}>🏥 Health Details</h4>
+                    <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Problem:</strong> {item.problem}</div>
+                    <div style={{ marginTop: "10px", color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Symptoms:</strong> {item.symptoms}</div>
                     {item.emergency === "Emergency" && (
                       <div style={{ marginTop: "10px", padding: "8px", background: "#fee2e2", color: "#dc2626", borderRadius: "8px", textAlign: "center", fontWeight: "bold" }}>
                         🚨 EMERGENCY CASE! 🚨
@@ -755,10 +900,10 @@ const DoctorDashboard = () => {
                   </div>
 
                   <div style={{ background: "white", padding: "18px", borderRadius: "12px" }}>
-                    <h4 style={{ fontWeight: "bold", marginBottom: "15px", color: "#333" }}>📅 Appointment Details</h4>
-                    <div><strong>Date:</strong> {new Date(item.preferredDate).toLocaleDateString()}</div>
-                    <div><strong>Time:</strong> {item.preferredTime}</div>
-                    <div style={{ marginTop: "10px", fontSize: "12px", color: "#888" }}>
+                    <h4 style={{ fontWeight: "bold", marginBottom: "15px", color: "#1a1a1a" }}>📅 Appointment Details</h4>
+                    <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Date:</strong> {new Date(item.preferredDate).toLocaleDateString()}</div>
+                    <div style={{ color: "#4a4a4a" }}><strong style={{ color: "#1a1a1a" }}>Time:</strong> {item.preferredTime}</div>
+                    <div style={{ marginTop: "10px", fontSize: "12px", color: "#9ca3af" }}>
                       Requested on: {new Date(item.createdAt).toLocaleString()}
                     </div>
                   </div>

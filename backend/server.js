@@ -6,6 +6,8 @@ const doctorRoutes = require("./routes/doctorRoutes");
 const userRoutes = require("./routes/userRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 
+const adminRoutes = require("./routes/adminRoutes");
+
 require("dotenv").config();
 
 const cookieParser = require("cookie-parser");
@@ -30,6 +32,8 @@ app.use(cookieParser());
 
 // ✅ STATIC FOLDER
 app.use("/uploads", express.static("uploads"));
+
+app.use("/api/admin", adminRoutes);
 
 
 // ================= DATABASE =================
@@ -59,8 +63,10 @@ app.get("/", (req, res) => {
 });
 
 
+
 // ================= SERVER =================
 
 app.listen(PORT, () => {
   console.log(`🌐 ASGS Server running on PORT ${PORT} 🚀`);
 });
+

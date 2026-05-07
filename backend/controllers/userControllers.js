@@ -2,8 +2,8 @@ const User = require("../models/userModels");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 require("dotenv").config();
-
 
 // ================= 📩 MAIL FUNCTION =================
 const sendOTP = async (otp, email) => {
@@ -34,11 +34,10 @@ const sendOTP = async (otp, email) => {
   }
 };
 
-
 // ================= 🔥 REGISTER =================
 const registerUser = async (req, res) => {
   try {
-    let { username, email, password } = req.body;
+    let { username, email, password, role } = req.body;
 
     email = email.toLowerCase();
 
@@ -91,13 +90,13 @@ const registerUser = async (req, res) => {
 
     // 🆕 NEW USER
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     user = new User({
       username,
       email,
       password: hashedPassword,
+      role: role || "admin", // ✅ Default role is admin
       otp,
       otpExpiry: Date.now() + 5 * 60 * 1000,
       isVerified: false,
@@ -116,7 +115,6 @@ const registerUser = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
-
 
 // ================= 🔥 VERIFY OTP =================
 const verifyOTP = async (req, res) => {
@@ -144,22 +142,26 @@ const verifyOTP = async (req, res) => {
     user.otp = null;
     user.otpExpiry = null;
     user.otpAttempts = 0;
-user.otpBlockTime = null;
+    user.otpBlockTime = null;
 
-    // ✅ TOKEN GENERATE
+    // ✅ TOKEN GENERATE with role
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { id: user._id, email: user.email, role: user.role || "admin" }, // ✅ Added role
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
 
     user.token = token;
-
     await user.save();
 
     res.status(200).json({
       message: "Email verified successfully ✅",
-      token: token
+      token: token,
+      user: {
+        id: user._id,
+        email: user.email,
+        role: user.role || "admin"
+      }
     });
 
   } catch (error) {
@@ -167,7 +169,6 @@ user.otpBlockTime = null;
     res.status(500).json({ message: "Server Error" });
   }
 };
-
 
 // ================= 🔥 LOGIN =================
 const loginUser = async (req, res) => {
@@ -192,8 +193,13 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid password ❌" });
     }
 
+    // ✅ Generate token with role
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { 
+        id: user._id, 
+        email: user.email, 
+        role: user.role || "admin"  // ✅ Role added here
+      },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -202,15 +208,22 @@ const loginUser = async (req, res) => {
     await user.save();
 
     res
-  .cookie("token", token, {
-    httpOnly: true,
-    secure: false, // production me true
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  })
-  .status(200)
-  .json({
-    message: "Login successful ✅"
-  });
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: false,
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      })
+      .status(200)
+      .json({
+        success: true,
+        message: "Login successful ✅",
+        token: token,
+        user: {
+          id: user._id,
+          email: user.email,
+          role: user.role || "admin"
+        }
+      });
 
   } catch (error) {
     console.error(error);
@@ -218,12 +231,9 @@ const loginUser = async (req, res) => {
   }
 };
 
-
+// ================= 🔥 LOGOUT =================
 const logoutUser = async (req, res) => {
   try {
-    console.log("Cookies:", req.cookies); // 🔍 debug
-
-    // ✅ safe access
     const token = req.cookies?.token;
 
     if (!token) {
@@ -242,20 +252,17 @@ const logoutUser = async (req, res) => {
     res.clearCookie("token");
 
     res.status(200).json({
+      success: true,
       message: "Logout successful ✅"
     });
 
   } catch (error) {
-    console.log("🔥 LOGOUT ERROR:", error); // 👉 ye important hai
+    console.log("🔥 LOGOUT ERROR:", error);
     res.status(500).json({ message: "Server Error" });
   }
 };
-const crypto = require("crypto");
-const sendResetMail = require("../emailverify/resetMail");
 
-
-
-// 🔥 FORGOT PASSWORD
+// ================= 🔥 FORGOT PASSWORD =================
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -266,15 +273,13 @@ const forgotPassword = async (req, res) => {
       return res.json({ message: "User not found ❌" });
     }
 
-    // 🔑 generate token
     const token = crypto.randomBytes(32).toString("hex");
 
     user.resetToken = token;
-    user.resetTokenExpiry = Date.now() + 10 * 60 * 1000; // 10 min
+    user.resetTokenExpiry = Date.now() + 10 * 60 * 1000;
 
     await user.save();
 
-    // 📩 send mail
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -302,7 +307,7 @@ const forgotPassword = async (req, res) => {
   }
 };
 
-// 🔥 RESET PASSWORD
+// ================= 🔥 RESET PASSWORD =================
 const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
@@ -331,5 +336,34 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// ================= 📊 GET CURRENT USER (Optional) =================
+const getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password -otp -resetToken");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // ================= EXPORT =================
-module.exports = { registerUser, verifyOTP, loginUser, logoutUser,forgotPassword, resetPassword };
+module.exports = { 
+  registerUser, 
+  verifyOTP, 
+  loginUser, 
+  logoutUser,
+  forgotPassword, 
+  resetPassword,
+  getCurrentUser  // ✅ Added
+};

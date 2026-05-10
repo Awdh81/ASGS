@@ -243,7 +243,7 @@ const Dashboard = () => {
     return (
       <div style={styles.loadingContainer}>
         <div style={styles.spinner}></div>
-        <p>Loading Admin Dashboard...</p>
+        <p style={{ color: 'white' }}>Loading Admin Dashboard...</p>
       </div>
     );
   }
@@ -266,6 +266,31 @@ const Dashboard = () => {
           @keyframes slideIn {
             from { transform: translateX(-100%); }
             to { transform: translateX(0); }
+          }
+          
+          /* Table styles for better visibility */
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          
+          th {
+            background-color: #f3f4f6;
+            color: #374151;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+          }
+          
+          td {
+            padding: 12px;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+          }
+          
+          tr:hover {
+            background-color: #f9fafb;
           }
         `}
       </style>
@@ -328,9 +353,9 @@ const Dashboard = () => {
               <div style={styles.statValue}>{stats.users.total}</div>
               <div style={styles.statLabel}>Total Users</div>
               <div style={styles.statDetails}>
-                <span>👨‍⚕️ {stats.users.doctors} Doctors</span>
-                <span>👤 {stats.users.patients} Patients</span>
-                <span>👑 {stats.users.admins} Admins</span>
+                <span style={{ color: '#4b5563' }}>👨‍⚕️ {stats.users.doctors} Doctors</span>
+                <span style={{ color: '#4b5563' }}>👤 {stats.users.patients} Patients</span>
+                <span style={{ color: '#4b5563' }}>👑 {stats.users.admins} Admins</span>
               </div>
             </div>
 
@@ -339,9 +364,9 @@ const Dashboard = () => {
               <div style={styles.statValue}>{stats.appointments.total}</div>
               <div style={styles.statLabel}>Total Appointments</div>
               <div style={styles.statDetails}>
-                <span>⏳ {stats.appointments.pending} Pending</span>
-                <span>✅ {stats.appointments.confirmed} Confirmed</span>
-                <span>❌ {stats.appointments.rejected} Rejected</span>
+                <span style={{ color: '#4b5563' }}>⏳ {stats.appointments.pending} Pending</span>
+                <span style={{ color: '#4b5563' }}>✅ {stats.appointments.confirmed} Confirmed</span>
+                <span style={{ color: '#4b5563' }}>❌ {stats.appointments.rejected} Rejected</span>
               </div>
             </div>
 
@@ -350,9 +375,9 @@ const Dashboard = () => {
               <div style={styles.statValue}>{stats.marketplace.totalListings}</div>
               <div style={styles.statLabel}>Marketplace Listings</div>
               <div style={styles.statDetails}>
-                <span>💰 ₹{stats.marketplace.totalRevenue}</span>
-                <span>📦 {stats.marketplace.totalSales} Sold</span>
-                <span>⏳ {stats.marketplace.pendingOrders} Pending</span>
+                <span style={{ color: '#4b5563' }}>💰 ₹{stats.marketplace.totalRevenue}</span>
+                <span style={{ color: '#4b5563' }}>📦 {stats.marketplace.totalSales} Sold</span>
+                <span style={{ color: '#4b5563' }}>⏳ {stats.marketplace.pendingOrders} Pending</span>
               </div>
             </div>
 
@@ -361,9 +386,9 @@ const Dashboard = () => {
               <div style={styles.statValue}>{stats.animals.total}</div>
               <div style={styles.statLabel}>Total Animals</div>
               <div style={styles.statDetails}>
-                <span>✅ {stats.animals.available} Available</span>
-                <span>🏠 {stats.animals.adopted} Adopted</span>
-                <span>⏳ {stats.animals.pendingAdoption} Pending</span>
+                <span style={{ color: '#4b5563' }}>✅ {stats.animals.available} Available</span>
+                <span style={{ color: '#4b5563' }}>🏠 {stats.animals.adopted} Adopted</span>
+                <span style={{ color: '#4b5563' }}>⏳ {stats.animals.pendingAdoption} Pending</span>
               </div>
             </div>
 
@@ -372,8 +397,8 @@ const Dashboard = () => {
               <div style={styles.statValue}>{activityCounts.total}</div>
               <div style={styles.statLabel}>Activity Events</div>
               <div style={styles.statDetails}>
-                <span>🔓 {activityCounts.login} Logins</span>
-                <span>🔒 {activityCounts.logout} Logouts</span>
+                <span style={{ color: '#4b5563' }}>🔓 {activityCounts.login} Logins</span>
+                <span style={{ color: '#4b5563' }}>🔒 {activityCounts.logout} Logouts</span>
               </div>
             </div>
           </div>
@@ -454,8 +479,8 @@ const Dashboard = () => {
                 <tbody>
                   {users.map((user) => (
                     <tr key={user._id}>
-                      <td>{user.name || user.username || 'N/A'}</td>
-                      <td>{user.email}</td>
+                      <td style={{ color: '#374151' }}>{user.name || user.username || 'N/A'}</td>
+                      <td style={{ color: '#374151' }}>{user.email}</td>
                       <td>
                         <span style={{
                           ...styles.roleBadge,
@@ -464,9 +489,9 @@ const Dashboard = () => {
                           {user.role}
                         </span>
                       </td>
-                      <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                      <td style={{ color: '#374151' }}>{new Date(user.createdAt).toLocaleDateString()}</td>
                       <td><span style={styles.activeBadge}>🟢 Active</span></td>
-                    </tr>
+                     </tr>
                   ))}
                 </tbody>
               </table>
@@ -490,8 +515,8 @@ const Dashboard = () => {
                 <tbody>
                   {activities.filter(a => a.action === 'login' || a.action === 'logout').map((activity) => (
                     <tr key={activity._id}>
-                      <td>{activity.userName || 'N/A'}</td>
-                      <td>{activity.userEmail}</td>
+                      <td style={{ color: '#374151' }}>{activity.userName || 'N/A'}</td>
+                      <td style={{ color: '#374151' }}>{activity.userEmail}</td>
                       <td>
                         <span style={{
                           ...styles.actionBadge,
@@ -500,9 +525,9 @@ const Dashboard = () => {
                           {activity.action === 'login' ? '🔓 LOGIN' : '🔒 LOGOUT'}
                         </span>
                       </td>
-                      <td>{new Date(activity.timestamp).toLocaleString()}</td>
-                      <td>{activity.ipAddress || 'N/A'}</td>
-                    </tr>
+                      <td style={{ color: '#374151' }}>{new Date(activity.timestamp).toLocaleString()}</td>
+                      <td style={{ color: '#374151' }}>{activity.ipAddress || 'N/A'}</td>
+                     </tr>
                   ))}
                 </tbody>
               </table>
@@ -533,12 +558,12 @@ const Dashboard = () => {
                 <tbody>
                   {appointments.map((apt) => (
                     <tr key={apt._id}>
-                      <td>{apt.ownerName}</td>
-                      <td>{apt.email}</td>
-                      <td>{apt.animalType}</td>
-                      <td>{apt.doctorName || 'Not assigned'}</td>
-                      <td>{new Date(apt.preferredDate).toLocaleDateString()}</td>
-                      <td>{apt.preferredTime}</td>
+                      <td style={{ color: '#374151' }}>{apt.ownerName}</td>
+                      <td style={{ color: '#374151' }}>{apt.email}</td>
+                      <td style={{ color: '#374151' }}>{apt.animalType}</td>
+                      <td style={{ color: '#374151' }}>{apt.doctorName || 'Not assigned'}</td>
+                      <td style={{ color: '#374151' }}>{new Date(apt.preferredDate).toLocaleDateString()}</td>
+                      <td style={{ color: '#374151' }}>{apt.preferredTime}</td>
                       <td>
                         <span style={{
                           ...styles.statusBadge,
@@ -547,8 +572,8 @@ const Dashboard = () => {
                           {apt.status}
                         </span>
                       </td>
-                      <td>{apt.emergency === 'Emergency' ? '🚨 Yes' : 'No'}</td>
-                    </tr>
+                      <td style={{ color: '#374151' }}>{apt.emergency === 'Emergency' ? '🚨 Yes' : 'No'}</td>
+                     </tr>
                   ))}
                 </tbody>
               </table>
@@ -564,8 +589,8 @@ const Dashboard = () => {
                   <div style={styles.doctorIcon}>👨‍⚕️</div>
                   <div style={styles.doctorName}>{doctor.name || doctor.email}</div>
                   <div style={styles.doctorStats}>
-                    <span>📅 {appointments.filter(a => a.doctorId === doctor._id).length} Appointments</span>
-                    <span>✅ {appointments.filter(a => a.doctorId === doctor._id && a.status === 'Confirmed').length} Confirmed</span>
+                    <span style={{ color: '#6b7280' }}>📅 {appointments.filter(a => a.doctorId === doctor._id).length} Appointments</span>
+                    <span style={{ color: '#6b7280' }}>✅ {appointments.filter(a => a.doctorId === doctor._id && a.status === 'Confirmed').length} Confirmed</span>
                   </div>
                   <button 
                     onClick={() => getDoctorAppointments(doctor._id)}
@@ -583,7 +608,7 @@ const Dashboard = () => {
             <div style={styles.modal} onClick={() => setSelectedDoctor(null)}>
               <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <div style={styles.modalHeader}>
-                  <h3>Doctor Appointments</h3>
+                  <h3 style={{ color: '#374151' }}>Doctor Appointments</h3>
                   <button onClick={() => setSelectedDoctor(null)} style={styles.closeButton}>✕</button>
                 </div>
                 <div style={styles.modalBody}>
@@ -599,11 +624,11 @@ const Dashboard = () => {
                     <tbody>
                       {doctorAppointments.map((apt) => (
                         <tr key={apt._id}>
-                          <td>{apt.ownerName}</td>
-                          <td>{apt.animalType}</td>
-                          <td>{new Date(apt.preferredDate).toLocaleDateString()}</td>
-                          <td>{apt.status}</td>
-                        </tr>
+                          <td style={{ color: '#374151' }}>{apt.ownerName}</td>
+                          <td style={{ color: '#374151' }}>{apt.animalType}</td>
+                          <td style={{ color: '#374151' }}>{new Date(apt.preferredDate).toLocaleDateString()}</td>
+                          <td style={{ color: '#374151' }}>{apt.status}</td>
+                         </tr>
                       ))}
                     </tbody>
                   </table>
@@ -634,10 +659,10 @@ const Dashboard = () => {
                 <tbody>
                   {marketplaceData.map((item) => (
                     <tr key={item._id}>
-                      <td>{item.name}</td>
-                      <td>{item.category}</td>
-                      <td>₹{item.price}</td>
-                      <td>{item.seller?.name || item.sellerEmail || 'N/A'}</td>
+                      <td style={{ color: '#374151' }}>{item.name}</td>
+                      <td style={{ color: '#374151' }}>{item.category}</td>
+                      <td style={{ color: '#374151' }}>₹{item.price}</td>
+                      <td style={{ color: '#374151' }}>{item.seller?.name || item.sellerEmail || 'N/A'}</td>
                       <td>
                         <span style={{
                           ...styles.statusBadge,
@@ -646,8 +671,8 @@ const Dashboard = () => {
                           {item.status || 'Available'}
                         </span>
                       </td>
-                      <td>{new Date(item.createdAt).toLocaleDateString()}</td>
-                    </tr>
+                      <td style={{ color: '#374151' }}>{new Date(item.createdAt).toLocaleDateString()}</td>
+                     </tr>
                   ))}
                 </tbody>
               </table>
@@ -696,11 +721,11 @@ const Dashboard = () => {
                 <tbody>
                   {animalListings.map((animal) => (
                     <tr key={animal._id}>
-                      <td>{animal.name}</td>
-                      <td>{animal.type}</td>
-                      <td>{animal.breed}</td>
-                      <td>{animal.age} years</td>
-                      <td>{animal.owner?.name || animal.ownerEmail || 'N/A'}</td>
+                      <td style={{ color: '#374151' }}>{animal.name}</td>
+                      <td style={{ color: '#374151' }}>{animal.type}</td>
+                      <td style={{ color: '#374151' }}>{animal.breed}</td>
+                      <td style={{ color: '#374151' }}>{animal.age} years</td>
+                      <td style={{ color: '#374151' }}>{animal.owner?.name || animal.ownerEmail || 'N/A'}</td>
                       <td>
                         <span style={{
                           ...styles.statusBadge,
@@ -709,8 +734,8 @@ const Dashboard = () => {
                           {animal.status || 'Available'}
                         </span>
                       </td>
-                      <td>{new Date(animal.createdAt).toLocaleDateString()}</td>
-                    </tr>
+                      <td style={{ color: '#374151' }}>{new Date(animal.createdAt).toLocaleDateString()}</td>
+                     </tr>
                   ))}
                 </tbody>
               </table>
@@ -780,7 +805,8 @@ const styles = {
     fontSize: '12px',
     display: 'flex',
     alignItems: 'center',
-    gap: '5px'
+    gap: '5px',
+    color: '#374151'
   },
   tabContainer: {
     display: 'flex',
@@ -826,13 +852,12 @@ const styles = {
   },
   statLabel: {
     fontSize: '14px',
-    color: '#666',
+    color: '#6b7280',
     marginTop: '5px'
   },
   statDetails: {
     marginTop: '10px',
     fontSize: '12px',
-    color: '#999',
     display: 'flex',
     justifyContent: 'center',
     gap: '10px',
@@ -853,7 +878,7 @@ const styles = {
   chartTitle: {
     margin: '0 0 20px 0',
     fontSize: '18px',
-    color: '#333'
+    color: '#374151'
   },
   chartContainer: {
     height: '250px'
@@ -868,7 +893,7 @@ const styles = {
   sectionTitle: {
     margin: '0 0 20px 0',
     fontSize: '20px',
-    color: '#333'
+    color: '#374151'
   },
   tableContainer: {
     overflowX: 'auto'
@@ -931,15 +956,15 @@ const styles = {
   },
   activityUser: {
     fontWeight: 'bold',
-    color: '#333'
+    color: '#374151'
   },
   activityAction: {
     fontSize: '12px',
-    color: '#666'
+    color: '#6b7280'
   },
   activityTime: {
     fontSize: '11px',
-    color: '#999'
+    color: '#9ca3af'
   },
   doctorGrid: {
     display: 'grid',
@@ -957,11 +982,11 @@ const styles = {
   },
   doctorName: {
     fontWeight: 'bold',
-    margin: '10px 0'
+    margin: '10px 0',
+    color: '#374151'
   },
   doctorStats: {
     fontSize: '12px',
-    color: '#666',
     display: 'flex',
     flexDirection: 'column',
     gap: '5px',

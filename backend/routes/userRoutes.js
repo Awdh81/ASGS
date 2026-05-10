@@ -4,6 +4,7 @@ const router = express.Router();
 
 // 🔐 Middleware
 const authMiddleware = require("../middleware/authMiddleware");
+const trackActivity = require("../middleware/trackActivity");
 
 // 👤 Controllers
 const { registerUser, verifyOTP, loginUser, logoutUser, forgotPassword, resetPassword,} = require("../controllers/userControllers");
@@ -18,10 +19,10 @@ router.post("/register", registerUser);
 router.post("/verify", verifyOTP);
 
 
-router.post("/login", loginUser);
+router.post("/login", trackActivity("login"), loginUser);
 
 
-router.post("/logout", logoutUser);
+router.post("/logout", authMiddleware, trackActivity("logout"), logoutUser);
 
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);

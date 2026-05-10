@@ -39,6 +39,7 @@ const Dashboard = () => {
   const [marketplaceData, setMarketplaceData] = useState([]);
   const [animalListings, setAnimalListings] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
+  const [activityCounts, setActivityCounts] = useState({ login: 0, logout: 0, total: 0 });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -54,42 +55,77 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem("token");
       
-      // Fetch users
-      const usersRes = await axios.get("http://localhost:8000/api/admin/users", {
+      // Fetch all dashboard stats in one call
+      const statsRes = await axios.get("http://localhost:8000/api/admin/dashboard-stats", {
         headers: { Authorization: `Bearer ${token}` }
-      }).catch(() => ({ data: [] }));
+      }).catch(() => ({ data: { data: null } }));
       
-      // Fetch appointments
-      const appointmentsRes = await axios.get("http://localhost:8000/api/admin/appointments/all", {
-        headers: { Authorization: `Bearer ${token}` }
-      }).catch(() => ({ data: [] }));
-      
-      // Fetch activities
+      // Fetch activities separately
       const activitiesRes = await axios.get("http://localhost:8000/api/admin/activity-logs", {
         headers: { Authorization: `Bearer ${token}` }
       }).catch(() => ({ data: { activities: [] } }));
       
-      // Fetch marketplace listings (buy/sell data)
-      const marketplaceRes = await axios.get("http://localhost:8000/api/marketplace/listings", {
-        headers: { Authorization: `Bearer ${token}` }
-      }).catch(() => ({ data: [] }));
+      if (statsRes.data && statsRes.data.data) {
+        const statsData = statsRes.data.data;
+        
+        // Set all the data from the dashboard-stats response
+        setUsers([
+          ...statsData.allUsers.admins.map(u => ({ ...u, role: 'admin' })),
+          ...statsData.allUsers.public.map(u => ({ ...u, role: 'public' })),
+          ...statsData.allUsers.doctors.map(u => ({ ...u, role: 'doctor' }))
+        ]);
+        setAppointments(statsData.recentAppointments || []);
+        
+        // Calculate statistics from the response
+        const stats = {
+          users: {
+            total: statsData.users.total,
+            doctors: statsData.users.doctors,
+            patients: statsData.users.publicUsers,
+            admins: statsData.users.admins
+          },
+          appointments: statsData.appointments,
+          marketplace: statsData.marketplace,
+          animals: {
+            total: statsData.marketplace.totalListings || 0,
+            adopted: statsData.marketplace.soldItems || 0,
+            available: statsData.marketplace.availableItems || 0,
+            pendingAdoption: 0
+          }
+        };
+        setStats(stats);
+      }
+
+      const marketRes = await axios.get("http://localhost:8000/api/public/market").catch(() => ({ data: { data: [] } }));
+      const marketItems = marketRes.data.data || [];
+      setMarketplaceData(marketItems);
+      setAnimalListings(marketItems.map((item) => ({
+        _id: item._id,
+        name: item.title,
+        type: item.type || '',
+        breed: item.breed || '',
+        age: item.age || '',
+        owner: {
+          name: item.sellerName
+        },
+        ownerEmail: item.sellerEmail,
+        status: item.status,
+        createdAt: item.createdAt
+      })));
       
-      // Fetch animal listings
-      const animalsRes = await axios.get("http://localhost:8000/api/animals", {
-        headers: { Authorization: `Bearer ${token}` }
-      }).catch(() => ({ data: [] }));
+      const activityList = activitiesRes.data.activities || [];
+      setActivities(activityList);
       
-      setUsers(usersRes.data || []);
-      setAppointments(appointmentsRes.data || []);
-      setActivities(activitiesRes.data.activities || []);
-      setMarketplaceData(marketplaceRes.data || []);
-      setAnimalListings(animalsRes.data || []);
-      
-      // Calculate statistics
-      calculateStats(usersRes.data, appointmentsRes.data, marketplaceRes.data, animalsRes.data);
+      const loginCount = activityList.filter(a => a.action === 'login').length;
+      const logoutCount = activityList.filter(a => a.action === 'logout').length;
+      setActivityCounts({
+        login: loginCount,
+        logout: logoutCount,
+        total: activityList.length
+      });
       
       // Get recent activities
-      const recent = (activitiesRes.data.activities || []).slice(0, 20);
+      const recent = activityList.slice(0, 20);
       setRecentActivities(recent);
       
     } catch (error) {
@@ -102,7 +138,7 @@ const Dashboard = () => {
   const calculateStats = (usersData, appointmentsData, marketplaceData, animalsData) => {
     // User stats
     const doctors = usersData?.filter(u => u.role === 'doctor').length || 0;
-    const patients = usersData?.filter(u => u.role === 'patient').length || 0;
+    const patients = usersData?.filter(u => u.role === 'public').length || 0;
     const admins = usersData?.filter(u => u.role === 'admin').length || 0;
     
     // Appointment stats
@@ -328,6 +364,16 @@ const Dashboard = () => {
                 <span>✅ {stats.animals.available} Available</span>
                 <span>🏠 {stats.animals.adopted} Adopted</span>
                 <span>⏳ {stats.animals.pendingAdoption} Pending</span>
+              </div>
+            </div>
+
+            <div style={styles.statCard}>
+              <div style={styles.statIcon}>🔐</div>
+              <div style={styles.statValue}>{activityCounts.total}</div>
+              <div style={styles.statLabel}>Activity Events</div>
+              <div style={styles.statDetails}>
+                <span>🔓 {activityCounts.login} Logins</span>
+                <span>🔒 {activityCounts.logout} Logouts</span>
               </div>
             </div>
           </div>

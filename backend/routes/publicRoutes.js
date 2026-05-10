@@ -14,15 +14,16 @@ const {
   buyAnimal
 } = require("../controllers/publicController");
 
-// 📸 Upload Middleware (Cloudinary)
+// � Middleware
 const upload = require("../middleware/upload");
+const trackActivity = require("../middleware/trackActivity");
 
 
 // ================= 🔐 AUTH =================
 router.post("/register", registerPublic);
 router.post("/verify", verifyPublic);
-router.post("/login", loginPublic);
-router.post("/logout", logoutPublic);
+router.post("/login", trackActivity("login"), loginPublic);
+router.post("/logout", trackActivity("logout"), logoutPublic);
 
 
 // ================= 🔑 PASSWORD =================

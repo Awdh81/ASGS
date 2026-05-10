@@ -15,11 +15,14 @@ const {
   resetDoctorPassword
 } = require("../controllers/doctorController");
 
+// 🔥 Middleware
+const trackActivity = require("../middleware/trackActivity");
+
 // ================= AUTH =================
 router.post("/register", registerDoctor);
 router.post("/verify", verifyDoctor);
-router.post("/login", loginDoctor);
-router.post("/logout", logoutDoctor);
+router.post("/login", trackActivity("login"), loginDoctor);
+router.post("/logout", trackActivity("logout"), logoutDoctor);
 router.post("/animal", addAnimal);
 router.post("/checkup", addCheckup);
 

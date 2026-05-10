@@ -1,4 +1,5 @@
 const Doctor = require("../models/doctorModel");
+const UserActivity = require("../models/UserActivity");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");

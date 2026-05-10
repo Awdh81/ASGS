@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Sell() {
@@ -24,18 +25,66 @@ function Sell() {
   });
 
   const [images, setImages] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
   const [video, setVideo] = useState(null);
 
   const navigate = useNavigate();
 
-  // 🔥 LOAD DATA & SELLER INFO
+  const saveLocalListing = (animal) => {
+    const stored = JSON.parse(localStorage.getItem("animals")) || [];
+    const updated = [animal, ...stored.filter((item) => item.id !== animal.id)];
+    localStorage.setItem("animals", JSON.stringify(updated));
+    return updated;
+  };
+
+  const fetchMarket = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/api/public/market");
+      const items = res.data.data || [];
+      const formatted = items.map((item) => ({
+        id: item._id,
+        name: item.title,
+        type: item.type || "",
+        age: item.age || "",
+        price: item.price,
+        description: item.description,
+        preview: item.image,
+        images: item.image ? [item.image] : [],
+        seller: {
+          name: item.sellerName,
+          email: item.sellerEmail,
+          phone: item.sellerPhone,
+          address: item.sellerAddress
+        }
+      }));
+
+      const localStored = JSON.parse(localStorage.getItem("animals")) || [];
+      const backendIds = new Set(formatted.map((item) => item.id));
+      const merged = [
+        ...formatted,
+        ...localStored.filter((item) => !backendIds.has(item.id))
+      ];
+
+      localStorage.setItem("animals", JSON.stringify(merged));
+      setAnimals(merged);
+    } catch (error) {
+      console.error("Failed to fetch market listings:", error);
+      const stored = JSON.parse(localStorage.getItem("animals")) || [];
+      setAnimals(stored);
+    }
+  };
+
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("animals")) || [];
-    setAnimals(data);
-    
+    fetchMarket();
+
     // Load seller info from localStorage (set during login)
     const savedSeller = JSON.parse(localStorage.getItem("sellerInfo")) || {};
-    setSellerInfo(savedSeller);
+    setSellerInfo({
+      sellerName: savedSeller.sellerName || "",
+      sellerEmail: savedSeller.sellerEmail || "",
+      sellerPhone: savedSeller.sellerPhone || "",
+      sellerAddress: savedSeller.sellerAddress || ""
+    });
   }, []);
 
   const handleChange = (e) => {
@@ -57,10 +106,12 @@ function Sell() {
 
   const handleImages = async (e) => {
     const files = Array.from(e.target.files || []);
-    if (files.length < 2) {
-      alert("Minimum 2 images required");
+    if (files.length === 0) {
+      alert("Please select at least 1 image");
       return;
     }
+
+    setImageFiles(files);
 
     const base64Images = await Promise.all(
       files.map((file) => convertToBase64(file))
@@ -77,47 +128,95 @@ function Sell() {
     setVideo(base64Video);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (images.length < 2) return alert("Upload 2 images");
-    if (!video) return alert("Upload 1 video");
+    if (imageFiles.length === 0) return alert("Upload at least 1 image");
     if (!sellerInfo.sellerName || !sellerInfo.sellerPhone) {
       return alert("Please enter your contact information");
     }
 
     setIsLoading(true);
 
-    setTimeout(() => {
+    const localAnimal = {
+      id: window.crypto?.randomUUID?.() || Date.now().toString(),
+      name: formData.name,
+      type: formData.type,
+      age: formData.age,
+      price: formData.price,
+      description: formData.description,
+      preview: images[0] || "",
+      images,
+      seller: {
+        name: sellerInfo.sellerName,
+        email: sellerInfo.sellerEmail,
+        phone: sellerInfo.sellerPhone,
+        address: sellerInfo.sellerAddress
+      }
+    };
+
+    try {
+      const payload = new FormData();
+      payload.append("title", formData.name);
+      payload.append("type", formData.type);
+      payload.append("age", formData.age);
+      payload.append("price", formData.price);
+      payload.append("description", formData.description);
+      payload.append("sellerName", sellerInfo.sellerName);
+      payload.append("sellerEmail", sellerInfo.sellerEmail);
+      payload.append("sellerPhone", sellerInfo.sellerPhone);
+      payload.append("sellerAddress", sellerInfo.sellerAddress);
+      payload.append("image", imageFiles[0]);
+
+      const res = await axios.post("http://localhost:8000/api/public/sell", payload, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      const marketItem = res.data.data;
       const newAnimal = {
-        id: Date.now(),
-        ...formData,
-        images,
-        video,
-        preview: images[0],
-        createdAt: new Date().toISOString(),
+        id: marketItem._id,
+        name: marketItem.title,
+        type: marketItem.type || formData.type,
+        age: marketItem.age || formData.age,
+        price: marketItem.price,
+        description: marketItem.description,
+        preview: marketItem.image,
+        images: marketItem.image ? [marketItem.image] : images,
         seller: {
-          name: sellerInfo.sellerName,
-          email: sellerInfo.sellerEmail,
-          phone: sellerInfo.sellerPhone,
-          address: sellerInfo.sellerAddress
+          name: marketItem.sellerName,
+          email: marketItem.sellerEmail,
+          phone: marketItem.sellerPhone,
+          address: marketItem.sellerAddress
         }
       };
 
-      const old = JSON.parse(localStorage.getItem("animals")) || [];
-      const updated = [...old, newAnimal];
-
-      localStorage.setItem("animals", JSON.stringify(updated));
-      localStorage.setItem("sellerInfo", JSON.stringify(sellerInfo));
-      
+      const updated = saveLocalListing(newAnimal);
       setAnimals(updated);
       setShowForm(false);
       setFormData({ name: "", type: "", age: "", price: "", description: "" });
       setImages([]);
+      setImageFiles([]);
       setVideo(null);
+      localStorage.setItem("sellerInfo", JSON.stringify(sellerInfo));
+      alert("Animal listed successfully! Buyers can now see it.");
+    } catch (error) {
+      console.error("Listing upload failed:", error);
+      const updated = saveLocalListing(localAnimal);
+      setAnimals(updated);
+      setShowForm(false);
+      setFormData({ name: "", type: "", age: "", price: "", description: "" });
+      setImages([]);
+      setImageFiles([]);
+      setVideo(null);
+      localStorage.setItem("sellerInfo", JSON.stringify(sellerInfo));
+      alert(
+        "Server unavailable. Listing saved locally and will appear in the marketplace."
+      );
+    } finally {
       setIsLoading(false);
-      alert("Animal listed successfully! Buyers can now contact you 🎉");
-    }, 500);
+    }
   };
 
   // 🔥 DELETE FUNCTION

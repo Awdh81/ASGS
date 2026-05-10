@@ -5,6 +5,7 @@ const Booking = require("../models/BookingModel");
 const Doctor = require("../models/doctorModel");
 const Public = require("../models/publicModel");
 const Market = require("../models/Market");
+const UserActivity = require("../models/UserActivity");
 const authMiddleware = require("../middleware/authMiddleware");
 
 // 🔐 Check if user is admin (middleware)
@@ -142,21 +143,10 @@ router.get("/animals", authMiddleware, isAdmin, async (req, res) => {
 // ================= 📋 GET ACTIVITY LOGS =================
 router.get("/activity-logs", authMiddleware, isAdmin, async (req, res) => {
   try {
-    // Get recent bookings as activity
-    const recentBookings = await Booking.find()
-      .sort({ createdAt: -1 })
-      .limit(50);
-    
-    const activities = recentBookings.map(booking => ({
-      id: booking._id,
-      userEmail: booking.email,
-      userName: booking.ownerName,
-      action: `appointment_${booking.status?.toLowerCase() || "created"}`,
-      details: { animal: booking.animalType, date: booking.preferredDate },
-      timestamp: booking.createdAt,
-      ipAddress: "N/A"
-    }));
-    
+    const activities = await UserActivity.find()
+      .sort({ timestamp: -1 })
+      .limit(100);
+
     res.json({ activities });
   } catch (error) {
     res.status(500).json({ message: error.message });

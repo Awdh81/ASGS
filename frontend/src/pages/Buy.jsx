@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function Buy() {
@@ -12,8 +13,44 @@ function Buy() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("animals")) || [];
-    setAnimals(data);
+    const fetchMarket = async () => {
+      const localStored = JSON.parse(localStorage.getItem("animals")) || [];
+
+      try {
+        const res = await axios.get("http://localhost:8000/api/public/market");
+        const items = res.data.data || [];
+        const formatted = items.map((item) => ({
+          id: item._id,
+          name: item.title,
+          type: item.type || "",
+          age: item.age || "",
+          price: item.price,
+          description: item.description,
+          preview: item.image,
+          seller: {
+            name: item.sellerName,
+            email: item.sellerEmail,
+            phone: item.sellerPhone,
+            address: item.sellerAddress
+          },
+          createdAt: item.createdAt
+        }));
+
+        const backendIds = new Set(formatted.map((item) => item.id));
+        const merged = [
+          ...formatted,
+          ...localStored.filter((item) => !backendIds.has(item.id))
+        ];
+
+        localStorage.setItem("animals", JSON.stringify(merged));
+        setAnimals(merged);
+      } catch (error) {
+        console.error("Failed to load market data:", error);
+        setAnimals(localStored);
+      }
+    };
+
+    fetchMarket();
   }, []);
 
   // Filter and sort animals
@@ -35,7 +72,11 @@ function Buy() {
   } else if (sortBy === "priceHigh") {
     filtered.sort((a, b) => b.price - a.price);
   } else if (sortBy === "latest") {
-    filtered.sort((a, b) => b.id - a.id);
+    filtered.sort((a, b) => {
+      const aDate = a.createdAt ? new Date(a.createdAt).getTime() : parseInt(a.id, 10) || 0;
+      const bDate = b.createdAt ? new Date(b.createdAt).getTime() : parseInt(b.id, 10) || 0;
+      return bDate - aDate;
+    });
   }
 
   const handleContactSeller = (seller) => {

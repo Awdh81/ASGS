@@ -12,11 +12,11 @@ const trackActivity = (action, getDetails = null) => {
         const activity = new UserActivity({
           userId: req.userId,
           userEmail: req.userEmail,
-          userName: req.userName,
+          userName: req.userEmail, // Use email as name for now
           userRole: req.userRole,
           action: action,
           details: getDetails ? getDetails(req, data) : {},
-          ipAddress: req.ip,
+          ipAddress: req.ip || req.connection.remoteAddress,
           userAgent: req.headers['user-agent']
         });
         activity.save().catch(err => console.error('Error tracking activity:', err));

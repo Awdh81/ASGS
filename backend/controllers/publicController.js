@@ -1,4 +1,5 @@
 const Public = require("../models/publicModel");
+const UserActivity = require("../models/UserActivity");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
@@ -218,11 +219,15 @@ exports.sellAnimal = async (req, res) => {
 
     const market = new Market({
       title: req.body.title,
-      price: req.body.price,
+      type: req.body.type,
+      age: Number(req.body.age) || undefined,
+      price: Number(req.body.price) || undefined,
       description: req.body.description,
       animalId: req.body.animalId,
       sellerName: req.body.sellerName,
+      sellerEmail: req.body.sellerEmail,
       sellerPhone: req.body.sellerPhone,
+      sellerAddress: req.body.sellerAddress,
       image: req.file.path   // ✅ Cloudinary URL
     });
 
